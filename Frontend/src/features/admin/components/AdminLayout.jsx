@@ -6,11 +6,9 @@ import {
   LayoutDashboardIcon,
   Building2Icon,
   UsersIcon,
+  HospitalIcon,
   BellIcon,
-  ChevronDownIcon,
-  LogOutIcon,
 } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import * as adminApi from "@/features/admin/api/adminApi";
@@ -20,59 +18,13 @@ const MOBILE_NAV = [
   { to: PATHS.ADMIN_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
   { to: `${PATHS.ADMIN_PHARMACIES}?status=PENDING`, label: "Pharmacies", icon: Building2Icon },
   { to: PATHS.ADMIN_USERS, label: "Users", icon: UsersIcon },
+  { to: PATHS.ADMIN_HOSPITALS, label: "Hospitals", icon: HospitalIcon },
 ];
-
-function AvatarMenu({ user, onLogout }) {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-foreground/10 bg-background/60 py-1 pl-1 pr-2 transition-all hover:border-foreground/20 hover:shadow-sm"
-      >
-        <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
-          <ShieldCheckIcon className="size-4" />
-        </span>
-        <span className="hidden text-left leading-tight sm:block">
-          <span className="block text-xs font-semibold text-foreground">Admin User</span>
-          <span className="block text-[11px] text-muted-foreground">Administrator</span>
-        </span>
-        <ChevronDownIcon className={cn("size-3.5 text-muted-foreground transition-transform", open && "rotate-180")} />
-      </button>
-      {open && (
-        <>
-          <button aria-hidden tabIndex={-1} className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-foreground/10 bg-background/95 shadow-xl shadow-foreground/5 backdrop-blur-xl duration-150 animate-in fade-in-0 zoom-in-95">
-            <div className="border-b border-foreground/5 p-3">
-              <p className="text-xs font-medium text-muted-foreground">Administrator</p>
-              <p className="truncate text-sm font-medium text-foreground">{user?.email}</p>
-            </div>
-            <button
-              onClick={onLogout}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              <LogOutIcon className="size-4 text-muted-foreground" />
-              Log out
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 const EMPTY_STATS = { totalUsers: 0, totalPharmacies: 0, pending: 0, approved: 0 };
 
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth();
   const location = useLocation();
 
   const [stats, setStats] = useState(EMPTY_STATS);
@@ -138,7 +90,6 @@ export default function AdminLayout() {
                   </span>
                 )}
               </button>
-              <AvatarMenu user={user} onLogout={logout} />
             </div>
           </div>
 

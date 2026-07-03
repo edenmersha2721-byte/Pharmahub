@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -7,11 +6,7 @@ import {
   SearchIcon,
   FileTextIcon,
   BellIcon,
-  ChevronDownIcon,
-  LogOutIcon,
-  UserIcon,
 } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import CustomerSidebar from "@/features/customer/components/CustomerSidebar";
@@ -22,72 +17,8 @@ const MOBILE_NAV = [
   { to: PATHS.CUSTOMER_PRESCRIPTIONS, label: "Upload", icon: FileTextIcon },
 ];
 
-function initials(email) {
-  if (!email) return "U";
-  return email.split("@")[0].slice(0, 2).toUpperCase();
-}
-
-function AvatarMenu({ user, onLogout }) {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-foreground/10 bg-background/60 py-1 pl-1 pr-2 transition-all hover:border-foreground/20 hover:shadow-sm"
-      >
-        <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-semibold text-white">
-          {initials(user?.email)}
-        </span>
-        <span className="hidden text-left leading-tight sm:block">
-          <span className="block text-xs font-semibold text-foreground">
-            Hi, {user?.email?.split("@")[0] ?? "there"}
-          </span>
-          <span className="block text-[11px] text-muted-foreground">Customer</span>
-        </span>
-        <ChevronDownIcon
-          className={cn("size-3.5 text-muted-foreground transition-transform", open && "rotate-180")}
-        />
-      </button>
-
-      {open && (
-        <>
-          <button aria-hidden tabIndex={-1} className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-foreground/10 bg-background/95 shadow-xl shadow-foreground/5 backdrop-blur-xl duration-150 animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center gap-3 border-b border-foreground/5 p-3">
-              <span className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-semibold text-white">
-                {initials(user?.email)}
-              </span>
-              <div className="min-w-0">
-                <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                  <UserIcon className="size-3" /> Customer
-                </p>
-                <p className="truncate text-sm font-medium text-foreground">{user?.email}</p>
-              </div>
-            </div>
-            <button
-              onClick={onLogout}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              <LogOutIcon className="size-4 text-muted-foreground" />
-              Log out
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 /** Customer shell: fixed sidebar + sticky top bar + routed content. */
 export default function CustomerLayout() {
-  const { user, logout } = useAuth();
   const location = useLocation();
 
   return (
@@ -115,7 +46,6 @@ export default function CustomerLayout() {
               >
                 <BellIcon className="size-[18px]" />
               </button>
-              <AvatarMenu user={user} onLogout={logout} />
             </div>
           </div>
 

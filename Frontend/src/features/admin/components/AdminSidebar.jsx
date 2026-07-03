@@ -4,6 +4,7 @@ import {
   LayoutDashboardIcon,
   UsersIcon,
   Building2Icon,
+  HospitalIcon,
   ChevronDownIcon,
   BarChart3Icon,
   SettingsIcon,
@@ -32,6 +33,11 @@ const SOON = [
   { label: "Activity Logs", icon: ActivityIcon },
 ];
 
+function initials(email) {
+  if (!email) return "U";
+  return email.split("@")[0].slice(0, 2).toUpperCase();
+}
+
 function SectionLabel({ children }) {
   return (
     <p className="px-3.5 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -51,7 +57,7 @@ function QuickStat({ label, value, loading }) {
 
 
 export default function AdminSidebar({ stats, loading }) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const statusParam = searchParams.get("status");
@@ -83,6 +89,11 @@ export default function AdminSidebar({ stats, loading }) {
         <NavLink to={PATHS.ADMIN_USERS} className={({ isActive }) => cn(itemBase, isActive ? activeItem : idleItem)}>
           <UsersIcon className="size-[18px]" />
           Users
+        </NavLink>
+
+        <NavLink to={PATHS.ADMIN_HOSPITALS} className={({ isActive }) => cn(itemBase, isActive ? activeItem : idleItem)}>
+          <HospitalIcon className="size-[18px]" />
+          Hospitals
         </NavLink>
 
        
@@ -140,13 +151,24 @@ export default function AdminSidebar({ stats, loading }) {
         </div>
       </div>
 
-      <button
-        onClick={logout}
-        className="m-3 mt-0 flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      >
-        <LogOutIcon className="size-[18px]" />
-        Logout
-      </button>
+      <div className="mt-auto border-t border-foreground/5 p-3">
+        <div className="mb-2 flex items-center gap-3 rounded-lg px-1 py-1.5">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-semibold text-white">
+            {initials(user?.email)}
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "Account"}</p>
+            <p className="text-[11px] text-muted-foreground">Administrator</p>
+          </div>
+        </div>
+        <button
+          onClick={logout}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-foreground/10 bg-background px-3.5 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-600"
+        >
+          <LogOutIcon className="size-[18px]" />
+          Log out
+        </button>
+      </div>
     </aside>
   );
 }

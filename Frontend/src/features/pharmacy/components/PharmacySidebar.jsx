@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
   LayoutDashboardIcon,
@@ -11,15 +11,25 @@ import {
   SettingsIcon,
   PillIcon,
   CrownIcon,
+  LogOutIcon,
 } from "lucide-react";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: PATHS.PHARMACY_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
-  { to: PATHS.PHARMACY_INVENTORY, label: "All Medicines", icon: BoxesIcon },
-  { to: `${PATHS.PHARMACY_INVENTORY}?add=1`, label: "Add Medicine", icon: PlusIcon },
+  { id: "dashboard", to: PATHS.PHARMACY_HOME, label: "Dashboard", icon: LayoutDashboardIcon },
+  { id: "all", to: PATHS.PHARMACY_INVENTORY, label: "All Medicines", icon: BoxesIcon },
+  { id: "add", to: `${PATHS.PHARMACY_INVENTORY}?add=1`, label: "Add Medicine", icon: PlusIcon },
 ];
+
+const itemClass = (active) =>
+  cn(
+    "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
+    active
+      ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/25"
+      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+  );
 
 const SOON = [
   { label: "Reservations", icon: ClipboardListIcon },
@@ -29,8 +39,27 @@ const SOON = [
   { label: "Settings", icon: SettingsIcon },
 ];
 
+function initials(email) {
+  if (!email) return "U";
+  return email.split("@")[0].slice(0, 2).toUpperCase();
+}
+
 /** Fixed left sidebar for the pharmacy area (desktop). */
 export default function PharmacySidebar() {
+  const { user, logout } = useAuth();
+  const { pathname } = useLocation();
+  const [searchParams] = useSearchParams();
+
+  // "Add Medicine" and "All Medicines" share a pathname and differ only by the
+  // `?add` query, so derive the active item explicitly instead of via NavLink.
+  const onInventory = pathname === PATHS.PHARMACY_INVENTORY;
+  const isAdd = searchParams.get("add") != null;
+  const activeId = pathname === PATHS.PHARMACY_HOME
+    ? "dashboard"
+    : onInventory
+      ? (isAdd ? "add" : "all")
+      : null;
+
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-foreground/5 bg-background/80 backdrop-blur-xl lg:flex">
       <div className="flex items-center gap-3 px-5 py-5">
@@ -44,23 +73,11 @@ export default function PharmacySidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
-        {NAV.map(({ to, label, icon: Icon, end }) => (
-          <NavLink
-            key={label}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200",
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/25"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )
-            }
-          >
+        {NAV.map(({ id, to, label, icon: Icon }) => (
+          <Link key={id} to={to} className={itemClass(activeId === id)}>
             <Icon className="size-[18px]" />
             {label}
-          </NavLink>
+          </Link>
         ))}
 
         <p className="px-3.5 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -89,6 +106,25 @@ export default function PharmacySidebar() {
           className="mt-3 w-full rounded-xl bg-white px-3 py-2 text-sm font-semibold text-indigo-700 transition-transform hover:-translate-y-0.5"
         >
           Upgrade Now
+        </button>
+      </div>
+
+      <div className="border-t border-foreground/5 p-3">
+        <div className="mb-2 flex items-center gap-3 rounded-lg px-1 py-1.5">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-semibold text-white">
+            {initials(user?.email)}
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "Account"}</p>
+            <p className="text-[11px] text-muted-foreground">Pharmacist</p>
+          </div>
+        </div>
+        <button
+          onClick={logout}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-foreground/10 bg-background px-3.5 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-600"
+        >
+          <LogOutIcon className="size-[18px]" />
+          Log out
         </button>
       </div>
     </aside>

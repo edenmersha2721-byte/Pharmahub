@@ -7,8 +7,9 @@ import {
   UserIcon,
   SettingsIcon,
   HeartPulseIcon,
-  LightbulbIcon,
+  LogOutIcon,
 } from "lucide-react";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 
@@ -17,15 +18,20 @@ const NAV = [
   { to: PATHS.CUSTOMER_HOME, label: "Home", icon: HomeIcon, end: true },
   { to: PATHS.CUSTOMER_SEARCH, label: "Search Medicine", icon: SearchIcon },
   { to: PATHS.CUSTOMER_PRESCRIPTIONS, label: "Upload Prescription", icon: FileTextIcon },
+  { to: PATHS.CUSTOMER_PROFILE, label: "My Profile", icon: UserIcon, badge: "New" },
 ];
 
 const SOON = [
   { label: "My Reservations", icon: BookmarkIcon },
-  { label: "My Profile", icon: UserIcon },
   { label: "Settings", icon: SettingsIcon },
 ];
 
-function NavItem({ to, label, icon: Icon, end }) {
+function initials(email) {
+  if (!email) return "U";
+  return email.split("@")[0].slice(0, 2).toUpperCase();
+}
+
+function NavItem({ to, label, icon: Icon, end, badge }) {
   return (
     <NavLink
       to={to}
@@ -39,14 +45,29 @@ function NavItem({ to, label, icon: Icon, end }) {
         )
       }
     >
-      <Icon className="size-[18px]" />
-      {label}
+      {({ isActive }) => (
+        <>
+          <Icon className="size-[18px]" />
+          {label}
+          {badge ? (
+            <span
+              className={cn(
+                "ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+                isActive ? "bg-white/20 text-white" : "bg-indigo-500/10 text-indigo-600"
+              )}
+            >
+              {badge}
+            </span>
+          ) : null}
+        </>
+      )}
     </NavLink>
   );
 }
 
 /** Fixed left sidebar for the customer area (desktop). */
 export default function CustomerSidebar() {
+  const { user, logout } = useAuth();
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-foreground/5 bg-background/80 backdrop-blur-xl lg:flex">
       {/* Brand */}
@@ -83,16 +104,23 @@ export default function CustomerSidebar() {
         ))}
       </nav>
 
-      {/* Health tip */}
-      <div className="m-3 rounded-2xl border border-foreground/5 bg-gradient-to-br from-cyan-500/10 to-emerald-500/10 p-4">
-        <div className="flex items-center gap-2 text-emerald-700">
-          <LightbulbIcon className="size-4" />
-          <span className="text-xs font-semibold uppercase tracking-wide">Health tip</span>
+      <div className="mt-auto border-t border-foreground/5 p-3">
+        <div className="mb-2 flex items-center gap-3 rounded-lg px-1 py-1.5">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-semibold text-white">
+            {initials(user?.email)}
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "Account"}</p>
+            <p className="text-[11px] text-muted-foreground">Customer</p>
+          </div>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          Always check the expiry date and confirm the dosage with your pharmacist before taking
-          any medicine.
-        </p>
+        <button
+          onClick={logout}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-foreground/10 bg-background px-3.5 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-600"
+        >
+          <LogOutIcon className="size-[18px]" />
+          Log out
+        </button>
       </div>
     </aside>
   );

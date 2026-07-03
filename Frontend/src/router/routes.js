@@ -9,9 +9,11 @@ export const PATHS = {
   CUSTOMER_HOME: "/dashboard",
   CUSTOMER_SEARCH: "/search",
   CUSTOMER_PRESCRIPTIONS: "/prescriptions",
+  CUSTOMER_PROFILE: "/profile",
   PHARMACY_HOME: "/pharmacy",
   PHARMACY_INVENTORY: "/pharmacy/inventory",
   ADMIN_HOME: "/admin",
   ADMIN_PHARMACIES: "/admin/pharmacies",
   ADMIN_USERS: "/admin/users",
+  ADMIN_HOSPITALS: "/admin/hospitals",
 };

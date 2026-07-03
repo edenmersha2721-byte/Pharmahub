@@ -31,6 +31,29 @@ export async function getUsers({ page = 0, size = 20 } = {}) {
 }
 
 
+// --- Hospital connections (integrated hospitals / verification directory) ----
+
+/**
+ * List all onboarded hospital connections.
+ * @returns array of { id, name, email, hospitalId, baseUrl, active }
+ */
+export async function getHospitalConnections() {
+  const { data } = await axiosInstance.get("/hospital-connections");
+  return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Onboard a new hospital. The backend generates the unique `hospitalId`
+ * (format HSP-XXXXX) — it is returned on the created connection.
+ */
+export async function createHospitalConnection({ name, email, baseUrl, apiKey } = {}) {
+  const payload = { name, email, baseUrl };
+  if (apiKey) payload.apiKey = apiKey;
+  const { data } = await axiosInstance.post("/hospital-connections", payload);
+  return data;
+}
+
+
 export function pharmacyStatusTone(status) {
   switch (status) {
     case "APPROVED":

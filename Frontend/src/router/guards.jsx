@@ -1,13 +1,18 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { PATHS } from "@/router/routes";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { roleHome } from "@/lib/auth/roles";
+import LandingPage from "@/features/landing/LandingPage";
 
 
+/**
+ * Root ("/"): authenticated users go to their role home; logged-out visitors
+ * see the public landing page.
+ */
 export function RootRedirect() {
   const { status, isAuthenticated, user } = useAuth();
   if (status === "loading") return null;
-  return <Navigate to={isAuthenticated ? roleHome(user?.role) : PATHS.LOGIN} replace />;
+  if (isAuthenticated) return <Navigate to={roleHome(user?.role)} replace />;
+  return <LandingPage />;
 }
 
 

@@ -11,6 +11,7 @@ import CustomerLayout from "@/features/customer/components/CustomerLayout";
 import CustomerDashboardPage from "@/features/customer/pages/CustomerDashboardPage";
 import MedicineSearchPage from "@/features/customer/pages/MedicineSearchPage";
 import PrescriptionsUploadPage from "@/features/customer/pages/PrescriptionsUploadPage";
+import MyProfilePage from "@/features/customer/pages/MyProfilePage";
 import PharmacyLayout from "@/features/pharmacy/components/PharmacyLayout";
 import PharmacyDashboardPage from "@/features/pharmacy/pages/PharmacyDashboardPage";
 import InventoryPage from "@/features/pharmacy/pages/InventoryPage";
@@ -18,6 +19,7 @@ import AdminLayout from "@/features/admin/components/AdminLayout";
 import AdminDashboardPage from "@/features/admin/pages/AdminDashboardPage";
 import ManagePharmacyPage from "@/features/admin/pages/ManagePharmacyPage";
 import ManageUserPage from "@/features/admin/pages/ManageUserPage";
+import ManageHospitalPage from "@/features/admin/pages/ManageHospitalPage";
 
 export const router = createBrowserRouter([
   { path: PATHS.ROOT, element: <RootRedirect /> },
@@ -39,6 +41,7 @@ export const router = createBrowserRouter([
           { path: PATHS.CUSTOMER_HOME, element: <CustomerDashboardPage /> },
           { path: PATHS.CUSTOMER_SEARCH, element: <MedicineSearchPage /> },
           { path: PATHS.CUSTOMER_PRESCRIPTIONS, element: <PrescriptionsUploadPage /> },
+          { path: PATHS.CUSTOMER_PROFILE, element: <MyProfilePage /> },
         ],
       },
     ],
@@ -64,6 +67,7 @@ export const router = createBrowserRouter([
           { path: PATHS.ADMIN_HOME, element: <AdminDashboardPage /> },
           { path: PATHS.ADMIN_PHARMACIES, element: <ManagePharmacyPage /> },
           { path: PATHS.ADMIN_USERS, element: <ManageUserPage /> },
+          { path: PATHS.ADMIN_HOSPITALS, element: <ManageHospitalPage /> },
         ],
       },
     ],

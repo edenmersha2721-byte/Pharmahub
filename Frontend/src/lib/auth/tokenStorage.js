@@ -31,6 +31,7 @@ export function decodeUser(token) {
       userId: claims.sub,
       email: claims.email ?? null,
       role: claims.role ?? null,
+      displayName: claims.displayName ?? claims.name ?? null,
       exp: claims.exp ?? null,
     };
   } catch {

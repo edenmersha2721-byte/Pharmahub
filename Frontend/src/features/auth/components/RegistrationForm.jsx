@@ -4,6 +4,7 @@ import FormField from "@/features/auth/components/FormField";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ROLES } from "@/lib/auth/roles";
 import { parseApiError } from "@/lib/helpers/helpers";
+import { saveProfileHint } from "@/lib/auth/profileStorage";
 import {
   validateEmail,
   validatePassword,
@@ -124,6 +125,9 @@ export default function RegistrationForm({ role }) {
         });
       } else {
         await registerCustomer(form);
+        saveProfileHint(form.email, {
+          displayName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+        });
       }
       setSuccessMessage(
         isPharmacy

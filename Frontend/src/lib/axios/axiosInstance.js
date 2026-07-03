@@ -4,12 +4,15 @@ import {
   getRefreshToken,
   setTokens,
   clearTokens,
+  decodeUser,
 } from "@/lib/auth/tokenStorage";
 
 /**
  * Single Axios instance for all gateway traffic.
  *
  * - Request interceptor attaches `Authorization: Bearer <accessToken>`.
+ * - Also sends `X-User-Id` / `X-User-Role` from the JWT for auth-service routes
+ *   like GET /auth/me that may not pass through the gateway JwtAuth filter.
  * - Response interceptor transparently refreshes the access token on a 401
  *   via `POST /auth/refresh?refreshToken=...`, then retries the failed request.
  *   Concurrent 401s are queued so only one refresh call is made.
@@ -28,9 +31,24 @@ function isAuthBypass(url = "") {
   return AUTH_BYPASS.some((path) => url.includes(path));
 }
 
+/** Attach Bearer token + identity headers expected by downstream services. */
+function attachAuthHeaders(config, token) {
+  if (!token) return config;
+  config.headers.Authorization = `Bearer ${token}`;
+
+  const user = decodeUser(token);
+  if (user?.userId) config.headers["X-User-Id"] = user.userId;
+  if (user?.role) config.headers["X-User-Role"] = user.role;
+  if (user?.email) config.headers["X-User-Email"] = user.email;
+
+  return config;
+}
+
 axiosInstance.interceptors.request.use((config) => {
   const token = getAccessToken();
-  if (token && !config.headers.Authorization) {
+  if (token && !isAuthBypass(config.url)) {
+    attachAuthHeaders(config, token);
+  } else if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -77,7 +95,7 @@ axiosInstance.interceptors.response.use(
       return new Promise((resolve, reject) => {
         pendingQueue.push({ resolve, reject });
       }).then((token) => {
-        original.headers.Authorization = `Bearer ${token}`;
+        attachAuthHeaders(original, token);
         original._retry = true;
         return axiosInstance(original);
       });
@@ -96,7 +114,7 @@ axiosInstance.interceptors.response.use(
         refreshToken: data.refreshToken,
       });
       flushQueue(null, data.accessToken);
-      original.headers.Authorization = `Bearer ${data.accessToken}`;
+      attachAuthHeaders(original, data.accessToken);
       return axiosInstance(original);
     } catch (refreshError) {
       flushQueue(refreshError, null);
