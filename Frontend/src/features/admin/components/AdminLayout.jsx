@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import {
   ShieldCheckIcon,
   LayoutDashboardIcon,
   Building2Icon,
   UsersIcon,
   HospitalIcon,
-  BellIcon,
 } from "lucide-react";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import * as adminApi from "@/features/admin/api/adminApi";
 import AdminSidebar from "@/features/admin/components/AdminSidebar";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 const MOBILE_NAV = [
   { to: PATHS.ADMIN_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
@@ -78,18 +77,7 @@ export default function AdminLayout() {
             <div className="hidden lg:block" />
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => toast("You're all caught up — no new alerts.")}
-                className="relative flex size-9 items-center justify-center rounded-full border border-foreground/10 bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Notifications"
-              >
-                <BellIcon className="size-[18px]" />
-                {stats.pending > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">
-                    {stats.pending > 9 ? "9+" : stats.pending}
-                  </span>
-                )}
-              </button>
+              <NotificationBell />
             </div>
           </div>
 

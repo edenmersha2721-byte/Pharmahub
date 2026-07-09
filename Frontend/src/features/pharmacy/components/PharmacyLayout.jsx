@@ -6,12 +6,13 @@ import {
   BoxesIcon,
   PlusIcon,
   MapPinIcon,
-  BellIcon,
   ChevronDownIcon,
 } from "lucide-react";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import PharmacySidebar from "@/features/pharmacy/components/PharmacySidebar";
+import OpenStatusToggle from "@/features/pharmacy/components/OpenStatusToggle";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 const MOBILE_NAV = [
   { to: PATHS.PHARMACY_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
@@ -45,13 +46,8 @@ export default function PharmacyLayout() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => toast("You're all caught up — no new alerts.")}
-                className="flex size-9 items-center justify-center rounded-full border border-foreground/10 bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Notifications"
-              >
-                <BellIcon className="size-[18px]" />
-              </button>
+              <OpenStatusToggle />
+              <NotificationBell />
             </div>
           </div>
 

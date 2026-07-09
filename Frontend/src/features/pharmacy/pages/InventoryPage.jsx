@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PlusIcon, SearchIcon, PackageIcon } from "lucide-react";
 import { useInventory } from "@/features/pharmacy/hooks/useInventory";
@@ -20,14 +20,29 @@ const FILTERS = [
 export default function InventoryPage() {
   const { items, page, setPage, meta, loading, error, create, update, remove } = useInventory();
 
-  const [searchParams] = useSearchParams();
-  // Open the Add dialog immediately when arriving via "Add Medicine" (?add=1).
-  const [editing, setEditing] = useState(() =>
-    searchParams.get("add") ? { medicine: null } : null
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+
+  // Open the add form when arriving via sidebar/mobile "Add Medicine" (?add=1).
+  useEffect(() => {
+    if (searchParams.get("add") != null) {
+      setEditing({ medicine: null });
+    }
+  }, [searchParams]);
+
+  const openAddForm = () => setEditing({ medicine: null });
+
+  const closeEditing = () => {
+    setEditing(null);
+    if (searchParams.get("add") != null) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("add");
+      setSearchParams(next, { replace: true });
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -54,7 +69,7 @@ export default function InventoryPage() {
           </p>
         </div>
         <button
-          onClick={() => setEditing({ medicine: null })}
+          onClick={openAddForm}
           className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-600/25 transition-all hover:from-indigo-500 hover:to-violet-500 active:scale-[0.98]"
         >
           <PlusIcon className="size-4" />
@@ -157,7 +172,7 @@ export default function InventoryPage() {
         <MedicineFormDialog
           key={editing.medicine?.id ?? "new"}
           initialValue={editing.medicine}
-          onClose={() => setEditing(null)}
+          onClose={closeEditing}
           onSubmit={(payload) =>
             editing.medicine ? update(editing.medicine.id, payload) : create(payload)
           }

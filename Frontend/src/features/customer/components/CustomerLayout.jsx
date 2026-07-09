@@ -1,15 +1,9 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { toast } from "sonner";
-import {
-  HeartPulseIcon,
-  HomeIcon,
-  SearchIcon,
-  FileTextIcon,
-  BellIcon,
-} from "lucide-react";
+import { HeartPulseIcon, HomeIcon, SearchIcon, FileTextIcon } from "lucide-react";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import CustomerSidebar from "@/features/customer/components/CustomerSidebar";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 
 const MOBILE_NAV = [
   { to: PATHS.CUSTOMER_HOME, label: "Home", icon: HomeIcon, end: true },
@@ -39,13 +33,7 @@ export default function CustomerLayout() {
             <div className="hidden lg:block" />
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => toast("You're all caught up — no new notifications.")}
-                className="relative flex size-9 items-center justify-center rounded-full border border-foreground/10 bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Notifications"
-              >
-                <BellIcon className="size-[18px]" />
-              </button>
+              <NotificationBell />
             </div>
           </div>
 

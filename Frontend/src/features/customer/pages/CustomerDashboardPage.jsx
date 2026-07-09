@@ -12,6 +12,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useDisplayName } from "@/features/auth/hooks/useDisplayName";
 import { PATHS } from "@/router/routes";
 
 const ACTIONS = [
@@ -48,7 +49,8 @@ const POPULAR = ["Paracetamol", "Amoxicillin", "Ibuprofen", "Vitamin C", "Omepra
 
 export default function CustomerDashboardPage() {
   const { user } = useAuth();
-  const name = user?.email?.split("@")[0] ?? "there";
+  const displayName = useDisplayName();
+  const name = displayName || user?.email?.split("@")[0] || "there";
 
   return (
     <div className="flex flex-col gap-6">

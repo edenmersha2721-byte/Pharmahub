@@ -14,6 +14,7 @@ import {
   LogOutIcon,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useDisplayName } from "@/features/auth/hooks/useDisplayName";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 
@@ -39,14 +40,18 @@ const SOON = [
   { label: "Settings", icon: SettingsIcon },
 ];
 
-function initials(email) {
-  if (!email) return "U";
-  return email.split("@")[0].slice(0, 2).toUpperCase();
+function initials(value) {
+  if (!value) return "U";
+  const base = value.includes("@") ? value.split("@")[0] : value.trim();
+  const parts = base.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return base.slice(0, 2).toUpperCase();
 }
 
 /** Fixed left sidebar for the pharmacy area (desktop). */
 export default function PharmacySidebar() {
   const { user, logout } = useAuth();
+  const displayName = useDisplayName();
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -112,10 +117,12 @@ export default function PharmacySidebar() {
       <div className="border-t border-foreground/5 p-3">
         <div className="mb-2 flex items-center gap-3 rounded-lg px-1 py-1.5">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-semibold text-white">
-            {initials(user?.email)}
+            {initials(displayName || user?.email)}
           </span>
           <div className="min-w-0 leading-tight">
-            <p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "Account"}</p>
+            <p className="truncate text-sm font-semibold text-foreground">
+              {displayName || user?.email?.split("@")[0] || "Account"}
+            </p>
             <p className="text-[11px] text-muted-foreground">Pharmacist</p>
           </div>
         </div>

@@ -46,3 +46,12 @@ export async function logout(refreshToken) {
   });
   return data;
 }
+
+/**
+ * Pharmacy toggles whether it is currently open for business. When closed the
+ * pharmacy is hidden from customer search. Returns { pharmacyId, open, message }.
+ */
+export async function setPharmacyOpenStatus(open) {
+  const { data } = await axiosInstance.patch("/auth/pharmacy/open-status", { open });
+  return data;
+}

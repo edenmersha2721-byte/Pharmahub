@@ -13,6 +13,7 @@ import {
   ArrowRightIcon,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useDisplayName } from "@/features/auth/hooks/useDisplayName";
 import { useInventory } from "@/features/pharmacy/hooks/useInventory";
 import { getStockStatus } from "@/features/pharmacy/constants";
 import MedicineCard from "@/features/pharmacy/components/MedicineCard";
@@ -94,7 +95,8 @@ export default function PharmacyDashboardPage() {
   }, [items]);
 
   const recent = items.slice(0, 8);
-  const name = user?.email?.split("@")[0] ?? "Pharmacist";
+  const displayName = useDisplayName();
+  const name = displayName || user?.email?.split("@")[0] || "Pharmacist";
 
   return (
     <div className="flex flex-col gap-6">
